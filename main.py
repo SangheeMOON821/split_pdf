@@ -23,7 +23,7 @@ def split_pdf(input_pdf_path, output_folder_path, page_ranges):
         output_path = os.path.join(output_folder_path, output_filename)
         pdf_writer.save(output_path)
         pdf_writer.close()
-        st.success(f"페이지 {start}에서 {end}까지 분할 완료: {output_path}")
+        
         with open(output_path, 'rb') as f:
             b64 = base64.b64encode(f.read()).decode()
             href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">다운로드</a>'
