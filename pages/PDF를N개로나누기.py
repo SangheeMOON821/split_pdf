@@ -49,6 +49,11 @@ if uploaded_file is not None:
     pdf_document.close()
     
     st.write(f"전체 페이지 수: {total_pages}")
+    
+    # 분할할 파트 수 입력 받기
+    n_parts = st.number_input("몇 개로 분할하시겠습니까?", min_value=1, max_value=total_pages, value=2, step=1)
+    
+    # 기본 페이지 분할 범위 계산
     base_pages = total_pages // n_parts
     remainder = total_pages % n_parts
     default_ranges = []
@@ -61,9 +66,6 @@ if uploaded_file is not None:
         default_ranges.append(f"{start_page}-{end_page}")
         start_page = end_page + 1
     st.write(f"기본은 {' , '.join(default_ranges)}와 같이 분할됩니다.")
-    
-    # 분할할 파트 수 입력 받기
-    n_parts = st.number_input("몇 개로 분할하시겠습니까?", min_value=1, max_value=total_pages, value=2, step=1)
     
     # 각 파트의 페이지 수 조정 (슬라이더 사용)
     page_ranges = []
