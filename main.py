@@ -60,7 +60,11 @@ if uploaded_file is not None:
             try:
                 for part in page_range_input.split(','):
                     start, end = map(int, part.split('-'))
-                    page_ranges.append((start, end))
+                    # 페이지 범위가 유효한지 확인
+                    if 1 <= start <= total_pages and 1 <= end <= total_pages and start <= end:
+                        page_ranges.append((start, end))
+                    else:
+                        st.warning(f"잘못된 페이지 범위: {start}-{end}. 전체 페이지 범위 내에서 유효한 값을 입력하세요.")
             except ValueError:
                 st.error("잘못된 형식입니다. 올바른 형식으로 페이지 범위를 입력하세요 (예: 1-3, 4-5)")
     elif mode == '슬라이더 사용':
