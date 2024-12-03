@@ -47,6 +47,7 @@ def create_zip_file(file_paths, output_zip_path):
             zipf.write(file_path, os.path.basename(file_path))
 
 # Streamlit 앱
+st.title("PDF 페이지 N개로 분할하기 by 🌟석리송🌟")
 uploaded_file = st.file_uploader("PDF 파일을 업로드하세요", type=["pdf"])
 output_folder_path = "output"
 os.makedirs(output_folder_path, exist_ok=True)
