@@ -33,7 +33,6 @@ def split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges):
                 href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">{output_filename} 다운로드</a>'
                 st.markdown(href, unsafe_allow_html=True)
     pdf_document.close()
-    
     st.info("전체 파일을 압축한 파일을 생성 중입니다. 잠시만 기다려주세요.")
 
         return output_files
