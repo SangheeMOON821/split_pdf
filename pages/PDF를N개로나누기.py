@@ -3,31 +3,16 @@ import streamlit as st
 import os
 import base64
 
-def split_pdf_into_n_parts(input_pdf_path, output_folder_path, n_parts):
+def split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges):
     """
-    PDF 파일을 N개의 파트로 나눕니다 (PyMuPDF 사용).
+    PDF 파일을 지정된 범위대로 나눕니다 (PyMuPDF 사용).
 
     Args:
         input_pdf_path (str): 분할할 PDF 파일 경로
         output_folder_path (str): 분할된 PDF를 저장할 폴더 경로
-        n_parts (int): 분할할 파트 수
+        page_ranges (list of tuples): 분할할 페이지 범위 목록
     """
     pdf_document = fitz.open(input_pdf_path)
-    total_pages = pdf_document.page_count
-    base_pages = total_pages // n_parts
-    remainder = total_pages % n_parts
-    
-    start_page = 1
-    page_ranges = []
-
-    # 기본 분할 (각 파트가 동일한 페이지 수를 가짐)
-    for i in range(n_parts):
-        end_page = start_page + base_pages - 1
-        if remainder > 0:  # 나머지 페이지를 앞의 파트에 하나씩 할당
-            end_page += 1
-            remainder -= 1
-        page_ranges.append((start_page, end_page))
-        start_page = end_page + 1
     
     # 각 범위에 대해 PDF 분할 수행
     for idx, (start, end) in enumerate(page_ranges):
@@ -78,7 +63,8 @@ if uploaded_file is not None:
             if i == n_parts - 1:
                 end_page = remainder
             else:
-                end_page = st.slider(f"파트 {i + 1} 페이지 수", start_page, remainder - (n_parts - i - 1), value=(remainder // (n_parts - i)))
+                max_value = remainder - (n_parts - i - 1)
+                end_page = st.slider(f"파트 {i + 1} 페이지 수", start_page, max_value, value=(remainder // (n_parts - i)))
             page_ranges.append((start_page, end_page))
             start_page = end_page + 1
             remainder -= (end_page - start_page + 1)
@@ -99,7 +85,7 @@ if uploaded_file is not None:
             try:
                 with st.spinner('PDF를 분할하고 있습니다. 잠시만 기다려주세요...'):
                     # PDF 분할 함수 호출
-                    split_pdf_into_n_parts(input_pdf_path, output_folder_path, n_parts)
+                    split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
             except Exception as e:
                 st.error(f"오류가 발생했습니다: {e}")
         else:
