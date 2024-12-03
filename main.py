@@ -5,7 +5,7 @@ import base64
 
 def split_pdf(input_pdf_path, output_folder_path, page_ranges):
     """
-    PDF 파일을 원하는 페이지 범위대로 나눕니다 (PyMuPDF 사용).
+    PDF 파일을 원하는 페이지 범위대로 나눕니다 (PyMuPDF 사용 by 석리송).
 
     Args:
         input_pdf_path (str): 분할할 PDF 파일 경로
