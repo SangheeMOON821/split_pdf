@@ -112,12 +112,11 @@ if uploaded_file is not None:
                     # PDF 분할 함수 호출
                     output_files = split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
                     st.write("모든 파일을 개별적으로 다운로드할 수 있습니다.")
-                for output_file in output_files:
-                    with open(output_file, 'rb') as f:
-                        b64 = base64.b64encode(f.read()).decode()
-                        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(output_file)}" style="display:inline-block; padding:10px 20px; background-color:#2196F3; color:white; text-decoration:none; border-radius:5px;">{os.path.basename(output_file)} 다운로드</a>'
-                        st.markdown(href, unsafe_allow_html=True)
-            except Exception as e:
+for output_file in output_files:
+    with open(output_file, 'rb') as f:
+        b64 = base64.b64encode(f.read()).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(output_file)}" style="display:inline-block; padding:10px 20px; background-color:#2196F3; color:white; text-decoration:none; border-radius:5px;">{os.path.basename(output_file)} 다운로드</a>'
+        st.markdown(href, unsafe_allow_html=True)            except Exception as e:
                 st.error(f"오류가 발생했습니다: {e}")
         else:
             st.error("분할할 페이지 범위를 지정하세요.")
