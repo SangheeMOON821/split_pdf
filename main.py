@@ -5,7 +5,7 @@ import base64
 
 def split_pdf(input_pdf_path, output_folder_path, page_ranges):
     """
-    PDF 파일을 원하는 페이지 범위대로 나눕니다 (PyMuPDF 사용 by 석리송).
+    PDF 파일을 원하는 페이지 범위대로 나눕니다 (PyMuPDF 사용).
 
     Args:
         input_pdf_path (str): 분할할 PDF 파일 경로
@@ -31,7 +31,7 @@ def split_pdf(input_pdf_path, output_folder_path, page_ranges):
     pdf_document.close()
 
 # Streamlit UI
-st.title("PDF 페이지 분할기 (PyMuPDF 사용)")
+st.title("PDF 페이지 분할기 (PyMuPDF 사용 by 🌟석리송🌟)")
 
 uploaded_file = st.file_uploader("PDF 파일을 업로드하세요", type=["pdf"])
 output_folder_path = "output"
