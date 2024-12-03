@@ -102,32 +102,35 @@ if uploaded_file is not None:
     
     # PDF 분할 버튼
     if st.button("③ PDF 분할하기"):
-        try:
-            # 작업 중 메시지
-            with st.spinner("⏳ PDF를 분할 중입니다. 파일 크기와 페이지 수에 따라 시간이 걸릴 수 있습니다."):
-                output_files = split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
-
-            # 작업 완료 메시지
-            st.write("📂 잠시 후 아래 버튼이 생성되면 분할된 파일을 다운로드할 수 있습니다.")
-            # 개별 다운로드 링크 생성
-            for output_file in output_files:
-                with open(output_file, 'rb') as f:
-                    b64 = base64.b64encode(f.read()).decode()
-                    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(output_file)}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">{os.path.basename(output_file)} 다운로드</a>'
-                    st.markdown(href, unsafe_allow_html=True)
-            st.success("✅ PDF 분할이 완료되었습니다!\n잠시만 기다리시면 분할된 파일을 압축한 파일을 다운로드할 수 있습니다.")
-
-            
-            # ZIP 파일 다운로드 링크 생성
-            zip_file_path = os.path.join(output_folder_path, "분할된_PDF_파일.zip")
-            create_zip_file(output_files, zip_file_path)
-            
-            with open(zip_file_path, 'rb') as f:
+    try:
+        # 작업 중 메시지
+        with st.spinner("⏳ PDF를 분할 중입니다. 파일 크기와 페이지 수에 따라 시간이 걸릴 수 있습니다."):
+            output_files = split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
+        
+        # 작업 완료 메시지
+        st.success("✅ PDF 분할이 완료되었습니다!")
+        st.write("📂 아래에서 파일을 다운로드하세요:")
+        
+        # 개별 다운로드 링크 생성
+        for output_file in output_files:
+            with open(output_file, 'rb') as f:
                 b64 = base64.b64encode(f.read()).decode()
-                href = f'<a href="data:application/octet-stream;base64,{b64}" download="분할된_PDF_파일.zip" style="display:inline-block; padding:10px 20px; background-color:#2196F3; color:white; text-decoration:none; border-radius:5px;">전체 파일 ZIP 다운로드</a>'
+                href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(output_file)}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">{os.path.basename(output_file)} 다운로드</a>'
                 st.markdown(href, unsafe_allow_html=True)
-    
-        except Exception as e:
-            # 오류 메시지 처리
-            st.error(f"⚠️ 오류가 발생했습니다: {e}")
+        
+        # 원본 파일 이름에서 확장자 제거
+        base_filename = os.path.splitext(os.path.basename(input_pdf_path))[0]
+        
+        # ZIP 파일 다운로드 링크 생성
+        zip_file_name = f"{base_filename}_분할된_PDF.zip"
+        zip_file_path = os.path.join(output_folder_path, zip_file_name)
+        create_zip_file(output_files, zip_file_path)
+        
+        with open(zip_file_path, 'rb') as f:
+            b64 = base64.b64encode(f.read()).decode()
+            href = f'<a href="data:application/octet-stream;base64,{b64}" download="{zip_file_name}" style="display:inline-block; padding:10px 20px; background-color:#2196F3; color:white; text-decoration:none; border-radius:5px;">{zip_file_name} 다운로드</a>'
+            st.markdown(href, unsafe_allow_html=True)
 
+    except Exception as e:
+        # 오류 메시지 처리
+        st.error(f"⚠️ 오류가 발생했습니다: {e}")
