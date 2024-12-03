@@ -80,6 +80,9 @@ if uploaded_file is not None:
         if remainder > 0:
             end_page += 1
             remainder -= 1
+        # 마지막 파트는 전체 페이지까지 포함하도록 설정
+        if i == n_parts - 1:
+            end_page = total_pages
         default_ranges.append(f"{start_page}-{end_page}")
         start_page = end_page + 1
     st.write(f"기본은 {' , '.join(default_ranges)}와 같이 분할됩니다.")
@@ -110,6 +113,9 @@ if uploaded_file is not None:
             if remainder > 0:
                 end_page += 1
                 remainder -= 1
+            # 마지막 파트는 전체 페이지까지 포함하도록 설정
+            if i == n_parts - 1:
+                end_page = total_pages
             page_ranges.append((start_page, end_page))
             start_page = end_page + 1
     
