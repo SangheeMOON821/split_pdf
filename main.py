@@ -29,6 +29,7 @@ def split_pdf(input_pdf_path, output_folder_path, page_ranges):
             href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">다운로드</a>'
             st.markdown(href, unsafe_allow_html=True)
     pdf_document.close()
+    st.success("분할이 완료되었습니다. 이제 다운로드할 수 있습니다.")
 
 # Streamlit UI
 st.title("PDF 페이지 분할기 by 🌟석리송🌟")
@@ -74,8 +75,9 @@ if uploaded_file is not None:
     if st.button("PDF 분할하기"):
         if page_ranges:
             try:
-                # PDF 분할 함수 호출
-                split_pdf(input_pdf_path, output_folder_path, page_ranges)
+                with st.spinner('PDF를 분할하고 있습니다. 잠시만 기다려주세요...'):
+                    # PDF 분할 함수 호출
+                    split_pdf(input_pdf_path, output_folder_path, page_ranges)
             except Exception as e:
                 st.error(f"오류가 발생했습니다: {e}")
         else:
