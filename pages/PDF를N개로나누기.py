@@ -4,17 +4,6 @@ import os
 import base64
 
 def split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges):
-    """
-    PDF 파일을 지정된 범위대로 나눕니다 (PyMuPDF 사용).
-
-    Args:
-        input_pdf_path (str): 분할할 PDF 파일 경로
-        output_folder_path (str): 분할된 PDF를 저장할 폴더 경로
-        page_ranges (list of tuples): 분할할 페이지 범위 목록
-
-    Returns:
-        list: 생성된 PDF 파일 경로 목록
-    """
     pdf_document = fitz.open(input_pdf_path)
     output_files = []
     
@@ -49,32 +38,44 @@ if uploaded_file is not None:
     
     st.write(f"전체 페이지 수: {total_pages}")
     
-    # 분할할 파트 수 입력 받기
-    n_parts = st.number_input("몇 개로 분할하시겠습니까?", min_value=1, max_value=total_pages, value=2, step=1)
-    
     # 기본 페이지 분할 범위 계산
+    n_parts = st.number_input("몇 개로 분할하시겠습니까?", min_value=1, max_value=total_pages, value=2, step=1)
     base_pages = total_pages // n_parts
     remainder = total_pages % n_parts
-    page_ranges = []
+    default_page_ranges = []
     start_page = 1
     for i in range(n_parts):
         end_page = start_page + base_pages - 1
         if remainder > 0:
             end_page += 1
             remainder -= 1
-        page_ranges.append((start_page, end_page))
+        default_page_ranges.append((start_page, end_page))
         start_page = end_page + 1
     
-    # 각 파트의 페이지 범위 슬라이더 제공
+    # 페이지 범위 사용자 입력
     custom_page_ranges = []
-    if st.checkbox("페이지 범위를 직접 조정하시겠습니까?"):
-        st.write("각 파트의 페이지 범위를 설정하세요:")
-        for i, (start, end) in enumerate(page_ranges):
-            start_page = st.number_input(f"파트 {i + 1} 시작 페이지", min_value=1, max_value=total_pages, value=start)
-            end_page = st.number_input(f"파트 {i + 1} 종료 페이지", min_value=start_page, max_value=total_pages, value=end)
-            custom_page_ranges.append((start_page, end_page))
+    user_input = st.text_input(
+        "페이지 범위를 입력하세요 (예: 1-5, 6-10). 입력하지 않으면 기본값이 사용됩니다.",
+        value=", ".join([f"{start}-{end}" for start, end in default_page_ranges])
+    )
+    
+    if user_input:
+        try:
+            custom_page_ranges = [
+                tuple(map(int, item.split('-')))
+                for item in user_input.replace(' ', '').split(',')
+                if '-' in item
+            ]
+            # 유효성 검사
+            valid = all(1 <= start <= end <= total_pages for start, end in custom_page_ranges)
+            if not valid:
+                st.error("입력된 범위가 유효하지 않습니다. 다시 확인해주세요.")
+                custom_page_ranges = default_page_ranges
+        except Exception:
+            st.error("입력 형식이 잘못되었습니다. 예: 1-5, 6-10")
+            custom_page_ranges = default_page_ranges
     else:
-        custom_page_ranges = page_ranges
+        custom_page_ranges = default_page_ranges
     
     if st.button("PDF 분할하기"):
         try:
@@ -82,7 +83,6 @@ if uploaded_file is not None:
                 output_files = split_pdf_into_n_parts(input_pdf_path, output_folder_path, custom_page_ranges)
                 st.success("PDF 분할 완료!")
                 
-                # 다운로드 링크 생성
                 for output_file in output_files:
                     with open(output_file, 'rb') as f:
                         b64 = base64.b64encode(f.read()).decode()
