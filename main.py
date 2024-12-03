@@ -49,25 +49,33 @@ if uploaded_file is not None:
     
     st.write(f"전체 페이지 수: {total_pages}")
     
-    # 페이지 범위 입력 방식과 슬라이더 방식 모두 지원
-    default_page_range = "1-1"  # 기본 페이지 범위 설정
-    page_range_input = st.text_input("페이지 범위를 입력하세요 (예: 1-3, 4-5)", value=default_page_range)
-    page_range_slider = st.slider("페이지 범위 선택", 1, total_pages, (1, total_pages))
-    
-    if st.button("PDF 분할하기"):
-        try:
-            # 입력된 페이지 범위와 슬라이더로 선택된 범위 병합
-            page_ranges = []
-            if page_range_input:
+    # 페이지 범위 입력 방식과 슬라이더 방식 중 선택하도록 설정
+    mode = st.radio("페이지 범위 선택 방법을 선택하세요:", ('텍스트 입력', '슬라이더 사용'))
+    page_ranges = []
+
+    if mode == '텍스트 입력':
+        default_page_range = "1-1"  # 기본 페이지 범위 설정
+        page_range_input = st.text_input("페이지 범위를 입력하세요 (예: 1-3, 4-5)", value=default_page_range)
+        if page_range_input:
+            try:
                 for part in page_range_input.split(','):
                     start, end = map(int, part.split('-'))
                     page_ranges.append((start, end))
-            page_ranges.append((page_range_slider[0], page_range_slider[1]))
-            
-            # PDF 분할 함수 호출
-            split_pdf(input_pdf_path, output_folder_path, page_ranges)
-        except Exception as e:
-            st.error(f"오류가 발생했습니다: {e}")
+            except ValueError:
+                st.error("잘못된 형식입니다. 올바른 형식으로 페이지 범위를 입력하세요 (예: 1-3, 4-5)")
+    elif mode == '슬라이더 사용':
+        page_range_slider = st.slider("페이지 범위 선택", 1, total_pages, (1, total_pages))
+        page_ranges.append((page_range_slider[0], page_range_slider[1]))
+    
+    if st.button("PDF 분할하기"):
+        if page_ranges:
+            try:
+                # PDF 분할 함수 호출
+                split_pdf(input_pdf_path, output_folder_path, page_ranges)
+            except Exception as e:
+                st.error(f"오류가 발생했습니다: {e}")
+        else:
+            st.error("분할할 페이지 범위를 지정하세요.")
 
 # requirements.txt 파일 생성
 requirements = """
