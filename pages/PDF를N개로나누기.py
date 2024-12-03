@@ -33,23 +33,9 @@ def split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges):
                 href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">{output_filename} 다운로드</a>'
                 st.markdown(href, unsafe_allow_html=True)
     pdf_document.close()
-    st.info("전체 파일을 압축한 파일을 생성 중입니다. 잠시만 기다려주세요.")
+    
     return output_files
 
-def create_zip_file(output_files, zip_filename):
-    """
-    분할된 PDF 파일들을 ZIP 파일로 묶습니다.
-
-    Args:
-        output_files (list of str): 분할된 PDF 파일 경로 목록
-        zip_filename (str): 생성할 ZIP 파일 경로
-    """
-    with zipfile.ZipFile(zip_filename, 'w') as zipf:
-        for file in output_files:
-            zipf.write(file, os.path.basename(file))
-
-# Streamlit UI
-st.title("PDF N개로 분할기 by 🌟석리송🌟")
 
 uploaded_file = st.file_uploader("PDF 파일을 업로드하세요", type=["pdf"])
 output_folder_path = "output"
@@ -85,7 +71,7 @@ if uploaded_file is not None:
             end_page = total_pages
         default_ranges.append(f"{start_page}-{end_page}")
         start_page = end_page + 1
-    st.write(f"기본은 {' , '.join(default_ranges)}와 같이 분할됩니다.")
+    st.write(f"기본은 {' , '.join(default_ranges)}와 같이 분할됩니다. 마지막 파트의 범위는 {default_ranges[-1]}입니다.")
     
     # 각 파트의 페이지 수 조정 (슬라이더 사용)
     page_ranges = []
@@ -125,14 +111,12 @@ if uploaded_file is not None:
                 with st.spinner('PDF를 분할하고 있습니다. 잠시만 기다려주세요...'):
                     # PDF 분할 함수 호출
                     output_files = split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
-                    # 모든 파일을 ZIP 파일로 묶기
-                    zip_filename = os.path.join(output_folder_path, "분할된_PDF_파일들.zip")
-                    create_zip_file(output_files, zip_filename)
-                    with open(zip_filename, 'rb') as f:
-                        b64 = base64.b64encode(f.read()).decode()
-                        href = f'<a href="data:application/zip;base64,{b64}" download="분할된_PDF_파일들.zip" style="display:inline-block; padding:10px 20px; background-color:#2196F3; color:white; text-decoration:none; border-radius:5px;">전체 ZIP 파일 다운로드</a>'
-                        st.markdown(href, unsafe_allow_html=True)
-            except Exception as e:
+                    st.write("모든 파일을 개별적으로 다운로드할 수 있습니다.")
+for output_file in output_files:
+    with open(output_file, 'rb') as f:
+        b64 = base64.b64encode(f.read()).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(output_file)}" style="display:inline-block; padding:10px 20px; background-color:#2196F3; color:white; text-decoration:none; border-radius:5px;">{os.path.basename(output_file)} 다운로드</a>'
+        st.markdown(href, unsafe_allow_html=True)            except Exception as e:
                 st.error(f"오류가 발생했습니다: {e}")
         else:
             st.error("분할할 페이지 범위를 지정하세요.")
