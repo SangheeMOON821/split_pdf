@@ -18,13 +18,15 @@ def split_pdf(input_pdf_path, output_folder_path, page_ranges):
         # PDF 페이지는 0부터 시작합니다.
         for page_num in range(start - 1, end):
             pdf_writer.insert_pdf(pdf_document, from_page=page_num, to_page=page_num)
-        output_path = f"{output_folder_path}/split_{idx + 1}.pdf"
+        base_filename = os.path.splitext(os.path.basename(input_pdf_path))[0]
+        output_filename = f"{base_filename}_{start}-{end}페이지.pdf"
+        output_path = os.path.join(output_folder_path, output_filename)
         pdf_writer.save(output_path)
         pdf_writer.close()
         st.success(f"페이지 {start}에서 {end}까지 분할 완료: {output_path}")
         with open(output_path, 'rb') as f:
             b64 = base64.b64encode(f.read()).decode()
-            href = f'<a href="data:application/octet-stream;base64,{b64}" download="split_{idx + 1}.pdf">여기에서 다운로드</a>'
+            href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}">여기에서 다운로드</a>'
             st.markdown(href, unsafe_allow_html=True)
     pdf_document.close()
 
@@ -36,7 +38,8 @@ output_folder_path = "output"
 os.makedirs(output_folder_path, exist_ok=True)
 
 if uploaded_file is not None:
-    page_range_input = st.text_input("페이지 범위를 입력하세요 (예: 1-3, 4-5)")
+    default_page_range = "1-1"  # 기본 페이지 범위 설정
+    page_range_input = st.text_input("페이지 범위를 입력하세요 (예: 1-3, 4-5)", value=default_page_range)
     if st.button("PDF 분할하기"):
         try:
             # 페이지 범위 파싱
