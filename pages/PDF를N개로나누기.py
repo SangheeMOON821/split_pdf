@@ -78,10 +78,10 @@ if uploaded_file is not None:
             if i == n_parts - 1:
                 end_page = remainder
             else:
-                end_page = st.slider(f"파트 {i + 1} 페이지 수", 1, remainder - (n_parts - i - 1), value=remainder // (n_parts - i))
-            page_ranges.append((start_page, start_page + end_page - 1))
-            start_page += end_page
-            remainder -= end_page
+                end_page = st.slider(f"파트 {i + 1} 페이지 수", start_page, remainder - (n_parts - i - 1), value=(remainder // (n_parts - i)))
+            page_ranges.append((start_page, end_page))
+            start_page = end_page + 1
+            remainder -= (end_page - start_page + 1)
     else:
         base_pages = total_pages // n_parts
         remainder = total_pages % n_parts
