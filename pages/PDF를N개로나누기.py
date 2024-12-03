@@ -82,8 +82,7 @@ if uploaded_file is not None:
             page_ranges.append((start_page, end_page))
             start_page = end_page + 1
         # 마지막 파트는 자동으로 마지막 페이지를 가리키도록 설정
-        end_page = st.slider(f"파트 {n_parts}의 마지막 페이지", start_page, total_pages, value=total_pages)
-        page_ranges.append((start_page, end_page))
+        page_ranges.append((start_page, total_pages))
     else:
         base_pages = total_pages // n_parts
         remainder = total_pages % n_parts
