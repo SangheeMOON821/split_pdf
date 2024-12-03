@@ -52,8 +52,7 @@ if uploaded_file is not None:
     # 페이지 범위 입력 방식과 슬라이더 방식 모두 지원
     default_page_range = "1-1"  # 기본 페이지 범위 설정
     page_range_input = st.text_input("페이지 범위를 입력하세요 (예: 1-3, 4-5)", value=default_page_range)
-    start_page = st.slider("시작 페이지", 1, total_pages, 1)
-    end_page = st.slider("끝 페이지", start_page, total_pages, start_page)
+    page_range_slider = st.slider("페이지 범위 선택", 1, total_pages, (1, total_pages))
     
     if st.button("PDF 분할하기"):
         try:
@@ -63,9 +62,17 @@ if uploaded_file is not None:
                 for part in page_range_input.split(','):
                     start, end = map(int, part.split('-'))
                     page_ranges.append((start, end))
-            page_ranges.append((start_page, end_page))
+            page_ranges.append((page_range_slider[0], page_range_slider[1]))
             
             # PDF 분할 함수 호출
             split_pdf(input_pdf_path, output_folder_path, page_ranges)
         except Exception as e:
             st.error(f"오류가 발생했습니다: {e}")
+
+# requirements.txt 파일 생성
+requirements = """
+streamlit
+pymupdf
+"""
+with open('requirements.txt', 'w') as f:
+    f.write(requirements)
