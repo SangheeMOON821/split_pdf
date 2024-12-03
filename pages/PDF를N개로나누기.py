@@ -70,18 +70,20 @@ if uploaded_file is not None:
     # 각 파트의 페이지 수 조정 (슬라이더 사용)
     page_ranges = []
     if st.checkbox("페이지 수 조정을 원하십니까?"):
-        st.write("각 파트의 페이지 수를 슬라이더로 조정하세요.")
+        st.write("각 파트의 마지막 페이지를 슬라이더로 조정하세요.")
         start_page = 1
-        remainder = total_pages
-        for i in range(n_parts):
-            if i == n_parts - 1:
-                end_page = total_pages
-            else:
-                max_value = remainder - (n_parts - i - 1)
-                end_page = st.slider(f"파트 {i + 1} 페이지 수", start_page, max_value, value=(remainder // (n_parts - i)))
+        for i in range(n_parts - 1):
+            max_value = total_pages - (n_parts - i - 1)
+            default_end_page = start_page + base_pages - 1
+            if remainder > 0:
+                default_end_page += 1
+                remainder -= 1
+            end_page = st.slider(f"파트 {i + 1}의 마지막 페이지", start_page, max_value, value=default_end_page)
             page_ranges.append((start_page, end_page))
             start_page = end_page + 1
-            remainder -= (end_page - start_page + 1)
+        # 마지막 파트는 자동으로 마지막 페이지를 가리키도록 설정
+        end_page = st.slider(f"파트 {n_parts}의 마지막 페이지", start_page, total_pages, value=total_pages)
+        page_ranges.append((start_page, end_page))
     else:
         base_pages = total_pages // n_parts
         remainder = total_pages % n_parts
@@ -104,3 +106,11 @@ if uploaded_file is not None:
                 st.error(f"오류가 발생했습니다: {e}")
         else:
             st.error("분할할 페이지 범위를 지정하세요.")
+
+# requirements.txt 파일 생성
+requirements = """
+streamlit
+pymupdf
+"""
+with open('requirements.txt', 'w') as f:
+    f.write(requirements)
