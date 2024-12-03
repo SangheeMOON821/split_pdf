@@ -108,8 +108,7 @@ if uploaded_file is not None:
                 output_files = split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
             
             # 작업 완료 메시지
-            st.success("✅ PDF 분할이 완료되었습니다!")
-            st.write("📂 아래에서 파일을 다운로드하세요:")
+            st.write("📂 잠시만 기다리시면 분할된 파일이 순차적으로 생성됩니다.")
             
             # 개별 다운로드 링크 생성
             for output_file in output_files:
@@ -120,11 +119,13 @@ if uploaded_file is not None:
             
             # 원본 파일 이름에서 확장자 제거
             base_filename = os.path.splitext(os.path.basename(input_pdf_path))[0]
-            
+            st.success("✅ PDF 분할이 완료되었습니다! 잠시 후 전체 파일을 압축한 파일도 제공해드립니다!")
+
             # ZIP 파일 다운로드 링크 생성
             zip_file_name = f"{base_filename}_분할된_PDF.zip"
             zip_file_path = os.path.join(output_folder_path, zip_file_name)
             create_zip_file(output_files, zip_file_path)
+
             
             with open(zip_file_path, 'rb') as f:
                 b64 = base64.b64encode(f.read()).decode()
