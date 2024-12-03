@@ -1,6 +1,7 @@
 import fitz  # PyMuPDF 사용
 import streamlit as st
 import os
+import base64
 
 def split_pdf(input_pdf_path, output_folder_path, page_ranges):
     """
@@ -21,6 +22,10 @@ def split_pdf(input_pdf_path, output_folder_path, page_ranges):
         pdf_writer.save(output_path)
         pdf_writer.close()
         st.success(f"페이지 {start}에서 {end}까지 분할 완료: {output_path}")
+        with open(output_path, 'rb') as f:
+            b64 = base64.b64encode(f.read()).decode()
+            href = f'<a href="data:application/octet-stream;base64,{b64}" download="split_{idx + 1}.pdf">여기에서 다운로드</a>'
+            st.markdown(href, unsafe_allow_html=True)
     pdf_document.close()
 
 # Streamlit UI
