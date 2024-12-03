@@ -104,11 +104,3 @@ if uploaded_file is not None:
                 st.error(f"오류가 발생했습니다: {e}")
         else:
             st.error("분할할 페이지 범위를 지정하세요.")
-
-# requirements.txt 파일 생성
-requirements = """
-streamlit
-pymupdf
-"""
-with open('requirements.txt', 'w') as f:
-    f.write(requirements)
