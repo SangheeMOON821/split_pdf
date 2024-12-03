@@ -31,7 +31,7 @@ def split_pdf(input_pdf_path, output_folder_path, page_ranges):
     pdf_document.close()
 
 # Streamlit UI
-st.title("PDF 페이지 분할기 (PyMuPDF 사용 by 🌟석리송🌟)")
+st.title("PDF 페이지 분할기 by 🌟석리송🌟")
 
 uploaded_file = st.file_uploader("PDF 파일을 업로드하세요", type=["pdf"])
 output_folder_path = "output"
