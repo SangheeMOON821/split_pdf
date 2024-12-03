@@ -106,10 +106,9 @@ if uploaded_file is not None:
             # 작업 중 메시지
             with st.spinner("⏳ PDF를 분할 중입니다. 파일 크기와 페이지 수에 따라 시간이 걸릴 수 있습니다."):
                 output_files = split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
-            
+
             # 작업 완료 메시지
-            st.write("📂 아래에서 파일을 다운로드하세요:")
-            
+            st.write("📂 잠시 후 아래 버튼이 생성되면 분할된 파일을 다운로드하세요:")
             # 개별 다운로드 링크 생성
             for output_file in output_files:
                 with open(output_file, 'rb') as f:
