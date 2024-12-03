@@ -26,7 +26,7 @@ def split_pdf(input_pdf_path, output_folder_path, page_ranges):
         st.success(f"페이지 {start}에서 {end}까지 분할 완료: {output_path}")
         with open(output_path, 'rb') as f:
             b64 = base64.b64encode(f.read()).decode()
-            href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}">여기에서 다운로드</a>'
+            href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">다운로드</a>'
             st.markdown(href, unsafe_allow_html=True)
     pdf_document.close()
 
@@ -38,20 +38,32 @@ output_folder_path = "output"
 os.makedirs(output_folder_path, exist_ok=True)
 
 if uploaded_file is not None:
+    input_pdf_path = os.path.join(output_folder_path, uploaded_file.name)
+    with open(input_pdf_path, 'wb') as f:
+        f.write(uploaded_file.read())
+    
+    # PDF 열어서 전체 페이지 수 확인
+    pdf_document = fitz.open(input_pdf_path)
+    total_pages = pdf_document.page_count
+    pdf_document.close()
+    
+    st.write(f"전체 페이지 수: {total_pages}")
+    
+    # 페이지 범위 입력 방식과 슬라이더 방식 모두 지원
     default_page_range = "1-1"  # 기본 페이지 범위 설정
     page_range_input = st.text_input("페이지 범위를 입력하세요 (예: 1-3, 4-5)", value=default_page_range)
+    start_page = st.slider("시작 페이지", 1, total_pages, 1)
+    end_page = st.slider("끝 페이지", start_page, total_pages, start_page)
+    
     if st.button("PDF 분할하기"):
         try:
-            # 페이지 범위 파싱
+            # 입력된 페이지 범위와 슬라이더로 선택된 범위 병합
             page_ranges = []
-            for part in page_range_input.split(','):
-                start, end = map(int, part.split('-'))
-                page_ranges.append((start, end))
-            
-            # 업로드된 파일을 임시 파일로 저장
-            input_pdf_path = os.path.join(output_folder_path, uploaded_file.name)
-            with open(input_pdf_path, 'wb') as f:
-                f.write(uploaded_file.read())
+            if page_range_input:
+                for part in page_range_input.split(','):
+                    start, end = map(int, part.split('-'))
+                    page_ranges.append((start, end))
+            page_ranges.append((start_page, end_page))
             
             # PDF 분할 함수 호출
             split_pdf(input_pdf_path, output_folder_path, page_ranges)
