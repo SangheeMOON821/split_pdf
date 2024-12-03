@@ -23,6 +23,8 @@ def split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges):
     return output_files
 
 # Streamlit 앱
+st.title("PDF 페이지 N개로 분할하기 by 🌟석리송🌟")
+
 uploaded_file = st.file_uploader("PDF 파일을 업로드하세요", type=["pdf"])
 output_folder_path = "output"
 os.makedirs(output_folder_path, exist_ok=True)
