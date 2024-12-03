@@ -30,10 +30,11 @@ def split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges):
             output_files.append(output_path)
             with open(output_path, 'rb') as f:
                 b64 = base64.b64encode(f.read()).decode()
-                href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">다운로드</a>'
+                href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">{output_filename} 다운로드</a>'
                 st.markdown(href, unsafe_allow_html=True)
     pdf_document.close()
     st.success("분할이 완료되었습니다. 이제 다운로드할 수 있습니다.")
+st.info("전체 파일을 압축한 파일을 생성 중입니다. 잠시만 기다려주세요.")
     return output_files
 
 def create_zip_file(output_files, zip_filename):
@@ -123,7 +124,7 @@ if uploaded_file is not None:
                     create_zip_file(output_files, zip_filename)
                     with open(zip_filename, 'rb') as f:
                         b64 = base64.b64encode(f.read()).decode()
-                        href = f'<a href="data:application/zip;base64,{b64}" download="분할된_PDF_파일들.zip" style="display:inline-block; padding:10px 20px; background-color:#2196F3; color:white; text-decoration:none; border-radius:5px;">전체 다운로드 (ZIP)</a>'
+                        href = f'<a href="data:application/zip;base64,{b64}" download="분할된_PDF_파일들.zip" style="display:inline-block; padding:10px 20px; background-color:#2196F3; color:white; text-decoration:none; border-radius:5px;">전체 ZIP 파일 다운로드</a>'
                         st.markdown(href, unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"오류가 발생했습니다: {e}")
