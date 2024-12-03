@@ -2,6 +2,7 @@ import fitz  # PyMuPDF 사용
 import streamlit as st
 import os
 import base64
+import zipfile
 
 def split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges):
     """
@@ -13,23 +14,39 @@ def split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges):
         page_ranges (list of tuples): 분할할 페이지 범위 목록
     """
     pdf_document = fitz.open(input_pdf_path)
+    output_files = []
     
     # 각 범위에 대해 PDF 분할 수행
     for idx, (start, end) in enumerate(page_ranges):
-        pdf_writer = fitz.open()
-        for page_num in range(start - 1, end):
-            pdf_writer.insert_pdf(pdf_document, from_page=page_num, to_page=page_num)
-        base_filename = os.path.splitext(os.path.basename(input_pdf_path))[0]
-        output_filename = f"{base_filename}_{start}-{end}페이지.pdf"
-        output_path = os.path.join(output_folder_path, output_filename)
-        pdf_writer.save(output_path)
-        pdf_writer.close()
-        with open(output_path, 'rb') as f:
-            b64 = base64.b64encode(f.read()).decode()
-            href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">다운로드</a>'
-            st.markdown(href, unsafe_allow_html=True)
+        if start <= end:  # 유효한 페이지 범위인지 확인
+            pdf_writer = fitz.open()
+            for page_num in range(start - 1, end):
+                pdf_writer.insert_pdf(pdf_document, from_page=page_num, to_page=page_num)
+            base_filename = os.path.splitext(os.path.basename(input_pdf_path))[0]
+            output_filename = f"{base_filename}_{start}-{end}페이지.pdf"
+            output_path = os.path.join(output_folder_path, output_filename)
+            pdf_writer.save(output_path)
+            pdf_writer.close()
+            output_files.append(output_path)
+            with open(output_path, 'rb') as f:
+                b64 = base64.b64encode(f.read()).decode()
+                href = f'<a href="data:application/octet-stream;base64,{b64}" download="{output_filename}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">다운로드</a>'
+                st.markdown(href, unsafe_allow_html=True)
     pdf_document.close()
     st.success("분할이 완료되었습니다. 이제 다운로드할 수 있습니다.")
+    return output_files
+
+def create_zip_file(output_files, zip_filename):
+    """
+    분할된 PDF 파일들을 ZIP 파일로 묶습니다.
+
+    Args:
+        output_files (list of str): 분할된 PDF 파일 경로 목록
+        zip_filename (str): 생성할 ZIP 파일 경로
+    """
+    with zipfile.ZipFile(zip_filename, 'w') as zipf:
+        for file in output_files:
+            zipf.write(file, os.path.basename(file))
 
 # Streamlit UI
 st.title("PDF N개로 분할기 by 🌟석리송🌟")
@@ -100,7 +117,14 @@ if uploaded_file is not None:
             try:
                 with st.spinner('PDF를 분할하고 있습니다. 잠시만 기다려주세요...'):
                     # PDF 분할 함수 호출
-                    split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
+                    output_files = split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
+                    # 모든 파일을 ZIP 파일로 묶기
+                    zip_filename = os.path.join(output_folder_path, "분할된_PDF_파일들.zip")
+                    create_zip_file(output_files, zip_filename)
+                    with open(zip_filename, 'rb') as f:
+                        b64 = base64.b64encode(f.read()).decode()
+                        href = f'<a href="data:application/zip;base64,{b64}" download="분할된_PDF_파일들.zip" style="display:inline-block; padding:10px 20px; background-color:#2196F3; color:white; text-decoration:none; border-radius:5px;">전체 다운로드 (ZIP)</a>'
+                        st.markdown(href, unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"오류가 발생했습니다: {e}")
         else:
