@@ -4,6 +4,9 @@ import os
 import base64
 import zipfile
 
+# 앱 제목 설정
+st.title("📄 PDF 페이지 N개로 분할하기 by 🌟석리송🌟")
+
 def split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges):
     pdf_document = fitz.open(input_pdf_path)
     output_files = []
@@ -94,5 +97,3 @@ if uploaded_file is not None:
                     st.markdown(href, unsafe_allow_html=True)
         except Exception as e:
             st.error(f"⚠️ 오류가 발생했습니다: {e}")
-    st.markdown("---")
-    st.markdown("App developed by 🌟**석리송**🌟", unsafe_allow_html=True)
