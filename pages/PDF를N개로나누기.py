@@ -108,7 +108,6 @@ if uploaded_file is not None:
                 output_files = split_pdf_into_n_parts(input_pdf_path, output_folder_path, page_ranges)
             
             # 작업 완료 메시지
-            st.success("✅ PDF 분할이 완료되었습니다!")
             st.write("📂 아래에서 파일을 다운로드하세요:")
             
             # 개별 다운로드 링크 생성
@@ -117,6 +116,8 @@ if uploaded_file is not None:
                     b64 = base64.b64encode(f.read()).decode()
                     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{os.path.basename(output_file)}" style="display:inline-block; padding:10px 20px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">{os.path.basename(output_file)} 다운로드</a>'
                     st.markdown(href, unsafe_allow_html=True)
+            st.success("✅ PDF 분할이 완료되었습니다! 잠시만 기다리시면 분할된 파일을 압축하여 다운로드할 수 있는 링크를 제공해드리겠습니다.")
+
             
             # ZIP 파일 다운로드 링크 생성
             zip_file_path = os.path.join(output_folder_path, "분할된_PDF_파일.zip")
